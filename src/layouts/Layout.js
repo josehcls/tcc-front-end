@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React  from 'react';
 import { Link, Route } from 'react-router-dom';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -16,20 +16,17 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Button from '@material-ui/core/Button'
 import AddToHomeScreenIcon from '@material-ui/icons/AddToHomeScreen';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import MemoryIcon from '@material-ui/icons/Memory';
 import PollIcon from '@material-ui/icons/Poll';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 
-
-
-
 import ListRecipesPage from '../pages/ListRecipesPage';
+import RecipeFormPage from '../pages/RecipeFormPage';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -90,12 +87,8 @@ const useStyles = makeStyles((theme) => ({
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
     },
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-    },
     appBarSpacer: theme.mixins.toolbar,
-      content: {
+    content: {
         flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
@@ -109,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
       overflow: 'auto',
       flexDirection: 'column',
-      height: 840,
+      height: 825,
     },
   }));
   
@@ -167,31 +160,36 @@ export default function Layout() {
             }}
         >
             <div className={classes.toolbar}>
-            <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </IconButton>
+              <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </IconButton>
             </div>
             <Divider />
             <List>
-            {[
-              {name: 'Dashboard', icon: ViewQuiltIcon, link: '/',}, 
-              {name: 'Receitas', icon: AssignmentIcon, link: '/receitas',}, 
-              {name: 'Dispositivos', icon: MemoryIcon, link: '/dispositivos',}, 
-              {name: 'Iniciar Lote', icon: AddToHomeScreenIcon, link: '/associar',}, 
-              {name: 'Análises', icon: PollIcon, link: '/analises',},
-            ].map(item => (
-                <ListItem button key={item.name} component={Link} to={item.link}>
-                  <ListItemIcon>{<item.icon />}</ListItemIcon>
-                  <ListItemText primary={item.name} />
-                </ListItem>
-            ))}
+              {[
+                {key:'dashboard', name: 'Dashboard', icon: ViewQuiltIcon, link: '/',}, 
+                {key:'receitas', name: 'Receitas', icon: AssignmentIcon, link: '/receitas',}, 
+                {key:'dispositivos', name: 'Dispositivos', icon: MemoryIcon, link: '/dispositivos',}, 
+                {key:'associar', name: 'Iniciar Lote', icon: AddToHomeScreenIcon, link: '/associar',}, 
+                {key:'analises', name: 'Análises', icon: PollIcon, link: '/analises',},
+              ].map(item => (
+              <Tooltip key={item.key} title={item.name} placement='right'>
+                  <ListItem button key={item.key} component={Link} to={item.link}>
+                    <ListItemIcon>
+                        {<item.icon />}
+                    </ListItemIcon>
+                    <ListItemText primary={item.name} />
+                  </ListItem>
+              </Tooltip>
+              ))}
             </List>           
         </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth="xl" className={classes.container}>
               <Paper className={classes.paper} >
-                <Route path='/receitas' component={ListRecipesPage} />
+                <Route exact path='/receitas' component={ListRecipesPage} />
+                <Route exact path='/receitas/:recipe_id' component={RecipeFormPage} />
               </Paper>
         </Container>
         </main>
