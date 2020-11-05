@@ -9,6 +9,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Title from '../components/Title';
 import * as RecipeService from '../services/RecipeService'
 
+
 class RecipeFormPage extends React.Component {
     constructor(props) {
         super(props);
@@ -59,7 +60,14 @@ class RecipeFormPage extends React.Component {
 
     handleSave = () => {
         if (this.state.is_editing) {
-            return;
+            RecipeService.putRecipe(this.state.recipe_id, this.state.recipe).then((data) => {
+                this.setState({
+                    recipe: data,
+                    recipe_id: data.recipe_id,
+                    is_editing: true,
+                    openSnackBar: true,
+                });
+            });
         }
         else {
             RecipeService.postRecipe(this.state.recipe).then((data) => {
@@ -90,7 +98,7 @@ class RecipeFormPage extends React.Component {
         return (
             <React.Fragment>
                 <Typography variant="h6" gutterBottom>
-                    <Title>Cadastrar Receita</Title>
+                    <Title>Receita</Title>
                 </Typography>
                 <Grid container spacing={3}>
                     <Grid item xs={2} />
