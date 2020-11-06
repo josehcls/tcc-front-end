@@ -116,23 +116,16 @@ class RecipeFormPage extends React.Component {
                         />
                     </Grid>
                     <Grid item xs={4}>
-                        <Autocomplete 
-                            freeSolo
-                            disableClearable
+                        <TextField
+                            variant="outlined"
+                            required
                             id="style-input"
-                            options={styles.map((option) => option.name)}
+                            label="Estilo"
+                            fullWidth
+                            onChange={this.handleChange}
+                            name="style"
                             value={this.state.recipe.style}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    required
-                                    label="Estilo"
-                                    variant="outlined"
-                                    onChange={this.handleChange}
-                                    name="style"
-                                    InputProps={{ ...params.InputProps, type: 'search' }}
-                                />
-                            )}
+                            autoComplete="off"
                         />
                     </Grid>
                     <Grid item xs={2} />
@@ -141,7 +134,7 @@ class RecipeFormPage extends React.Component {
                     <Grid item xs={8}>
                         <TextField
                             id="misc-input"
-                            label="Misc"
+                            label="Descrição"
                             multiline
                             rows={16}
                             fullWidth
@@ -171,61 +164,5 @@ class RecipeFormPage extends React.Component {
         );
     }
 }
-
-const styles = [
-    { key: "altbier", name: "Altbier" },
-    { key: "amber", name: "Amber ale" },
-    { key: "barley", name: "Barley wine" },
-    { key: "berliner", name: "Berliner Weisse" },
-    { key: "biere", name: "Bière de Garde" },
-    { key: "bitter", name: "Bitter" },
-    { key: "blonde", name: "Blonde Ale" },
-    { key: "bock", name: "Bock" },
-    { key: "brown", name: "Brown ale" },
-    { key: "california", name: "California Common/Steam Beer" },
-    { key: "cream", name: "Cream Ale" },
-    { key: "dortmunder", name: "Dortmunder Export" },
-    { key: "doppelbock", name: "Doppelbock" },
-    { key: "dunkel", name: "Dunkel" },
-    { key: "dunkelweizen", name: "Dunkelweizen" },
-    { key: "eisbock", name: "Eisbock" },
-    { key: "flanders", name: "Flanders red ale" },
-    { key: "golden", name: "Golden/Summer ale" },
-    { key: "gose", name: "Gose" },
-    { key: "gueuze", name: "Gueuze" },
-    { key: "hefeweizen", name: "Hefeweizen" },
-    { key: "helles", name: "Helles" },
-    { key: "india", name: "India pale ale" },
-    { key: "kolsch", name: "Kölsch" },
-    { key: "lambic", name: "Lambic" },
-    { key: "light", name: "Light ale" },
-    { key: "maibock", name: "Maibock/Helles bock" },
-    { key: "malt", name: "Malt liquor" },
-    { key: "mild", name: "Mild" },
-    { key: "oktoberfestbier", name: "Oktoberfestbier/Märzenbier" },
-    { key: "old", name: "Old ale" },
-    { key: "oud", name: "Oud bruin" },
-    { key: "pale", name: "Pale ale" },
-    { key: "pilsener", name: "Pilsener/Pilsner/Pils" },
-    { key: "porter", name: "Porter" },
-    { key: "red", name: "Red ale" },
-    { key: "roggenbier", name: "Roggenbier" },
-    { key: "saison", name: "Saison" },
-    { key: "scotch", name: "Scotch ale" },
-    { key: "stout", name: "Stout" },
-    { key: "schwarzbier", name: "Schwarzbier" },
-    { key: "vienna", name: "Vienna lager" },
-    { key: "witbier", name: "Witbier" },
-    { key: "weissbier", name: "Weissbier" },
-    { key: "weizenbock", name: "Weizenbock" },
-    { key: "fruit", name: "Fruit beer" },
-    { key: "herb", name: "Herb and spiced beer" },
-    { key: "honey", name: "Honey beer" },
-    { key: "rye", name: "Rye Beer" },
-    { key: "smoked", name: "Smoked beer" },
-    { key: "vegetable", name: "Vegetable beer" },
-    { key: "wild", name: "Wild beer" },
-    { key: "wood", name: "Wood-aged beer" },
-]
 
 export default RecipeFormPage;
