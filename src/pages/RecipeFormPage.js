@@ -1,12 +1,12 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import Autocomplete from '@material-ui/lab/Autocomplete'; 
-import Title from '../components/Title';
 import * as RecipeService from '../services/RecipeService'
 
 
@@ -20,7 +20,7 @@ class RecipeFormPage extends React.Component {
                 misc: "",
             },
             is_editing: false,
-            recipe_id: null,
+            recipe_id: 0,
             openSnackBar: false,
         };
     }
@@ -98,7 +98,10 @@ class RecipeFormPage extends React.Component {
         return (
             <React.Fragment>
                 <Typography variant="h6" gutterBottom>
-                    <Title>Receita</Title>
+                <Breadcrumbs aria-label="breadcrumb">
+                    <Link color="inherit" href="/receitas">Receitas</Link>
+                    <Link color="inherit" href={`/receitas/${this.state.recipe_id}`}>{this.state.recipe_id == 0 ? 'Nova Receita' : this.state.recipe.name}</Link>
+                </Breadcrumbs>
                 </Typography>
                 <Grid container spacing={3}>
                     <Grid item xs={2} />

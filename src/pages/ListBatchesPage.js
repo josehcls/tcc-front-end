@@ -14,14 +14,16 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
+import FilterFramesIcon from '@material-ui/icons/FilterFrames';
+
 
 import ConfirmDialog from '../components/ConfirmDialog';
 import moment from "moment";
 
 import * as RecipeService from '../services/RecipeService'
+import * as BatchService from '../services/BatchService'
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -44,11 +46,14 @@ const StyledTableCell = withStyles((theme) => ({
   makeStyles();
 
 
-class ListRecipePages extends Component {
+class ListBatchesPage extends Component {
     constructor(props) {
         super(props);
+        const {recipe_id} = this.props.match.params;
         this.state = {
             data: [],
+            recipe: {},
+            recipe_id: recipe_id,
             openDeleteDialog: false,
             selected: {name: "", recipe_id: 0},
             page: 0,
@@ -59,6 +64,8 @@ class ListRecipePages extends Component {
     handleChangePage = (event, newPage) => {
         this.setState({
             data: this.state.data,
+            recipe: this.state.recipe,
+            recipe_id: this.state.recipe_id,
             openDeleteDialog: this.state.openDeleteDialog,
             selected: this.state.selected,
             page: newPage,
@@ -69,6 +76,8 @@ class ListRecipePages extends Component {
     setOpenDeleteDialog = (value) => {
         this.setState({
             data: this.state.data,
+            recipe: this.state.recipe,
+            recipe_id: this.state.recipe_id,
             openDeleteDialog: value,
             selected: this.state.selected,
             page: this.state.page,
@@ -79,6 +88,8 @@ class ListRecipePages extends Component {
     confirmDelete = (value) => {
         this.setState({
             data: this.state.data,
+            recipe: this.state.recipe,
+            recipe_id: this.state.recipe_id,
             openDeleteDialog: true,
             selected: value,
             page: this.state.page,
@@ -87,24 +98,30 @@ class ListRecipePages extends Component {
     }
 
     componentDidMount = () => {
-        RecipeService.getRecipes(this.state.page, 10).then((data) => {
-            this.setState({
-                data: data.content,
-                openDeleteDialog: this.state.openDeleteDialog,
-                selected: this.state.selected,
-                page: this.state.page,
-                total: data.totalElements,
-            });
+        RecipeService.getRecipe(this.state.recipe_id).then((recipe) => {
+            RecipeService.getBatches(this.state.recipe_id, this.state.page, 10).then((data) => {
+                this.setState({
+                    data: data.content,
+                    recipe: recipe,
+                    recipe_id: this.state.recipe_id,
+                    openDeleteDialog: this.state.openDeleteDialog,
+                    selected: this.state.selected,
+                    page: this.state.page,
+                    total: data.totalElements,
+                });
+            })
         });
     }
 
-    deleteSelectedRecipe = () => {
-        RecipeService.deleteRecipe(this.state.selected.recipe_id).then(() => {
-            RecipeService.getRecipes(this.state.page, 10).then((data) => {
+    deleteSelectedBatch = () => {
+        BatchService.deleteBatch(this.state.selected.batch_id).then(() => {
+            RecipeService.getBatches(this.state.batch_id, this.state.page, 10).then((data) => {
                 this.setState({
                     data: data,
+                    recipe: this.state.recipe,
+                    recipe_id: this.state.recipe_id,
                     openDeleteDialog: this.state.openDeleteDialog,
-                    selected: {name: "", recipe_id: 0},
+                    selected: {name: "", batch_id: 0},
                     page: this.state.page,
                     total: this.state.total,
                 });
@@ -116,46 +133,56 @@ class ListRecipePages extends Component {
         return (
             <React.Fragment>
                 <Grid container spacing={0}>
-                    <Grid item xs={6}><Breadcrumbs aria-label="breadcrumb"><Link color="inherit" href="/receitas">Receitas</Link></Breadcrumbs></Grid>
+                    <Grid item xs={6}>
+                        <Breadcrumbs aria-label="breadcrumb">
+                            <Link color="inherit" href="/receitas">Receitas</Link>
+                            <Link color="inherit" href={`/receitas/${this.state.recipe.recipe_id}`}>{this.state.recipe.name}</Link>
+                            <Link color="inherit" href={`/receitas/${this.state.recipe.recipe_id}/lotes`}>Lotes</Link>
+                        </Breadcrumbs>
+                    </Grid>
                     <Grid item xs={5}></Grid>
-                    <Grid item xs={1}><Button variant="contained" color="secondary" href={'/receitas/0'}>Adicionar</Button></Grid>
+                    <Grid item xs={1}><Button variant="contained" color="secondary" href={`/receitas/${this.state.recipe_id}/lotes/0`}>Adicionar</Button></Grid>
                 </Grid>
                 <Box p={1} />
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell><b>Nome da Receita</b></StyledTableCell>
-                            <StyledTableCell><b>Estilo</b></StyledTableCell>
-                            <StyledTableCell><b>Cadastrada Por</b></StyledTableCell>
-                            <StyledTableCell><b>Cadastrada Em</b></StyledTableCell>
+                            <StyledTableCell><b>Identificação</b></StyledTableCell>
+                            <StyledTableCell><b>Status</b></StyledTableCell>
+                            <StyledTableCell><b>Iniciado Em</b></StyledTableCell>
+                            <StyledTableCell><b>Finalizado Em</b></StyledTableCell>
+                            <StyledTableCell><b>Dispositivo</b></StyledTableCell>
+                            <StyledTableCell><b>Perfil de Controle</b></StyledTableCell>
                             <StyledTableCell><b>Ações</b></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.state.data.map((recipe) => (
-                            <StyledTableRow key={recipe.recipe_id}>
-                                <StyledTableCell>{recipe.name}</StyledTableCell>
-                                <StyledTableCell>{recipe.style}</StyledTableCell>
-                                <StyledTableCell>{recipe.created_by}</StyledTableCell>
-                                <StyledTableCell>{moment(recipe.created_at).format("DD/MM/YYYY HH:mm")}</StyledTableCell>
+                        {this.state.data.map((batch) => (
+                            <StyledTableRow key={batch.batch_id}>
+                                <StyledTableCell>{batch.name}</StyledTableCell>
+                                <StyledTableCell>{batch.status}</StyledTableCell>
+                                <StyledTableCell>{moment(batch.started_at).format("DD/MM/YYYY HH:mm")}</StyledTableCell>
+                                <StyledTableCell>{moment(batch.finished_at).format("DD/MM/YYYY HH:mm")}</StyledTableCell>
+                                <StyledTableCell>{moment(batch.device.name)}</StyledTableCell>
+                                <StyledTableCell>{moment(batch.control_profile.name)}</StyledTableCell>
                                 <StyledTableCell>
                                     <Grid container>
                                         <Grid item xs={2}>
-                                            <IconButton color='secondary' href={`/receitas/${recipe.recipe_id}/lotes`}>
-                                                <Tooltip title='Ver Lotes' placement='top'>
-                                                    <AccountTreeIcon />
+                                            <IconButton color='secondary' href={`/receitas/${batch.batch_id}/lotes`}>
+                                                <Tooltip title='Associar a Dispositivo' placement='top'>
+                                                    <FilterFramesIcon />
                                                 </Tooltip>
                                             </IconButton>
                                         </Grid>
                                         <Grid item xs={2}>
-                                            <IconButton href={`/receitas/${recipe.recipe_id}`}>
+                                            <IconButton href={`/receitas/${this.state.recipe_id}/lotes/${batch.batch_id}`}>
                                                 <Tooltip title='Editar' placement='top'>
                                                     <EditIcon />
                                                 </Tooltip>
                                             </IconButton>
                                         </Grid>
                                         <Grid item xs={2}>
-                                            <IconButton onClick={() => {this.confirmDelete(recipe)}}>
+                                            <IconButton onClick={() => {this.confirmDelete(batch)}}>
                                                 <Tooltip title='Excluir' placement='top'>
                                                     <DeleteIcon />
                                                 </Tooltip>
@@ -177,15 +204,15 @@ class ListRecipePages extends Component {
                 />
                 <ConfirmDialog 
                     title='Confirmação para excluir Receita' 
-                    children={<Typography> Você realmente quer excluir a receita <b>{this.state.selected.name}</b>? Essa ação não poderá ser desfeita.</Typography>}
+                    children={<Typography> Você realmente quer excluir o Lote <b>{this.state.selected.name}</b>? Essa ação não poderá ser desfeita.</Typography>}
                     open={this.state.openDeleteDialog}
                     setOpen={this.setOpenDeleteDialog}
-                    onConfirm={this.deleteSelectedRecipe}
-                    id={this.state.selected.recipe_id}
+                    onConfirm={this.deleteSelectedBatch}
+                    id={this.state.selected.batch_id}
                 />
             </React.Fragment>
         );
     }
 }
 
-export default ListRecipePages;
+export default ListBatchesPage;

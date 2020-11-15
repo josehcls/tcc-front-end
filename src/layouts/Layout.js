@@ -20,6 +20,7 @@ import AddToHomeScreenIcon from '@material-ui/icons/AddToHomeScreen';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import MemoryIcon from '@material-ui/icons/Memory';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import PollIcon from '@material-ui/icons/Poll';
 import Container from '@material-ui/core/Container';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -27,6 +28,8 @@ import Paper from '@material-ui/core/Paper';
 
 import ListRecipesPage from '../pages/ListRecipesPage';
 import RecipeFormPage from '../pages/RecipeFormPage';
+import ListBatchesPage from '../pages/ListBatchesPage';
+import ListControlProfilesPage from '../pages/ListControlProfilesPage';
 import '../App.css';
 
 const drawerWidth = 240;
@@ -168,8 +171,9 @@ export default function Layout() {
             <List>
               {[
                 {key:'dashboard', name: 'Dashboard', icon: ViewQuiltIcon, link: '/',}, 
-                {key:'receitas', name: 'Receitas', icon: AssignmentIcon, link: '/receitas',}, 
                 {key:'dispositivos', name: 'Dispositivos', icon: MemoryIcon, link: '/dispositivos',}, 
+                {key:'receitas', name: 'Receitas', icon: AssignmentIcon, link: '/receitas',}, 
+                {key:'controle', name: 'Perfis de Controle', icon: TimelineIcon, link: '/controle',}, 
                 {key:'associar', name: 'Iniciar Lote', icon: AddToHomeScreenIcon, link: '/associar',}, 
                 {key:'analises', name: 'Análises', icon: PollIcon, link: '/analises',},
               ].map(item => (
@@ -190,6 +194,8 @@ export default function Layout() {
               <Paper className={classes.paper} >
                 <Route exact path='/receitas' component={ListRecipesPage} />
                 <Route exact path='/receitas/:recipe_id' component={RecipeFormPage} />
+                <Route exact path='/receitas/:recipe_id/lotes' component={ListBatchesPage} />
+                <Route exact path='/controle' component={ListControlProfilesPage} />
               </Paper>
         </Container>
         </main>
