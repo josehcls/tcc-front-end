@@ -18,7 +18,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import FilterFramesIcon from '@material-ui/icons/FilterFrames';
 
-
 import ConfirmDialog from '../components/ConfirmDialog';
 import moment from "moment";
 

@@ -104,6 +104,7 @@ class RecipeFormPage extends React.Component {
                 </Breadcrumbs>
                 </Typography>
                 <Grid container spacing={3}>
+                    <Grid item xs={12} />
                     <Grid item xs={2} />
                     <Grid item xs={4}>
                         <TextField
