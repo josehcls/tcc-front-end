@@ -102,7 +102,7 @@ class ListRecipePages extends Component {
         RecipeService.deleteRecipe(this.state.selected.recipe_id).then(() => {
             RecipeService.getRecipes(this.state.page, 10).then((data) => {
                 this.setState({
-                    data: data,
+                    data: data.content,
                     openDeleteDialog: this.state.openDeleteDialog,
                     selected: {name: "", recipe_id: 0},
                     page: this.state.page,

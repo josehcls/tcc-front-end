@@ -13,6 +13,18 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import Divider from '@material-ui/core/Divider';
+import Box from '@material-ui/core/Box';
+import AddIcon from '@material-ui/icons/Add';
+import AddBoxIcon from '@material-ui/icons/AddBox';
+import ClearIcon from '@material-ui/icons/Clear';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 
 import * as RecipeService from '../services/RecipeService'
@@ -26,13 +38,20 @@ class BatchFormPage extends React.Component {
             batch: {
                 name: "",
                 misc: "",
-                control_profile: {}
+                recipe: {},
+                control_profile: {
+                    name: "",
+                    steps: []
+                }
             },
             batch_id: batch_id,
-            recipe: {},
             recipe_id: recipe_id,
             is_editing: false,
             openSnackBar: false,
+            new_step: {
+                value: null, 
+                time_offset: null,
+            }
         };
     }
 
@@ -40,17 +59,15 @@ class BatchFormPage extends React.Component {
         const is_editing = this.state.batch_id > 0;
 
         RecipeService.getRecipe(this.state.recipe_id).then((recipe) => {
+            let batch = JSON.parse(JSON.stringify(this.state.batch));
+            batch.recipe = recipe
             this.setState({
-                batch: {
-                    name: "",
-                    misc: "",
-                    control_profile: {}
-                },
+                batch: batch,
                 batch_id: this.state.batch_id,
-                recipe: recipe,
                 recipe_id: this.state.recipe_id,
                 is_editing: is_editing,
                 openSnackBar: false,
+                new_step: this.state.new_step,
             });
         });
 
@@ -59,10 +76,10 @@ class BatchFormPage extends React.Component {
                 this.setState({
                     batch: batch,
                     batch_id: this.state.batch_id,
-                    recipe: this.state.recipe,
                     recipe_id: this.state.recipe_id,
                     is_editing: this.state.is_editing,
                     openSnackBar: false,
+                    new_step: this.state.new_step,
                 });
             });
     }
@@ -74,10 +91,23 @@ class BatchFormPage extends React.Component {
         this.setState({
             batch: batch,
             batch_id: this.state.batch_id,
-            recipe: this.state.recipe,
             recipe_id: this.state.recipe_id,
             is_editing: this.state.is_editing,
             openSnackBar: false,
+            new_step: this.state.new_step,
+        });
+    }
+
+    handleNewStepChange = (event) => {
+        let new_step = JSON.parse(JSON.stringify(this.state.new_step));
+        new_step[event.target.name] = event.target.value
+        this.setState({
+            batch: this.state.batch,
+            batch_id: this.state.batch_id,
+            recipe_id: this.state.recipe_id,
+            is_editing: this.state.is_editing,
+            openSnackBar: false,
+            new_step: new_step,
         });
     }
 
@@ -87,10 +117,10 @@ class BatchFormPage extends React.Component {
                 this.setState({
                     batch: data,
                     batch_id: data.batch_id,
-                    recipe: this.state.recipe,
                     recipe_id: this.state.recipe_id,
                     is_editing: true,
                     openSnackBar: true,
+                    new_step: this.state.new_step,
                 });
             });
         }
@@ -99,10 +129,10 @@ class BatchFormPage extends React.Component {
                 this.setState({
                     batch: data,
                     batch_id: data.batch_id,
-                    recipe: this.state.recipe,
                     recipe_id: this.state.recipe_id,
                     is_editing: true,
                     openSnackBar: true,
+                    new_step: this.state.new_step,
                 });
                 this.props.history.replace({ pathname: `/receitas/${this.state.recipe_id}/lotes/${data.batch_id}`})
             });
@@ -116,12 +146,58 @@ class BatchFormPage extends React.Component {
         this.setState({
             batch: this.state.batch,
             batch_id: this.state.batch_id,
-            recipe: this.state.recipe,
             recipe_id: this.state.recipe_id,
             is_editing: this.state.is_editing,
             openSnackBar: false,
+            new_step: this.state.new_step,
         });
     };
+
+    addStep = () => {
+        const value = this.state.new_step.value;
+        const timeOffset = this.state.new_step.time_offset;
+        const step = {
+            step: this.state.batch.control_profile.steps.length,
+            variable: "TEMPERATURE", 
+            value: value, 
+            time_offset: timeOffset
+        };
+        let batch = JSON.parse(JSON.stringify(this.state.batch));
+        batch.control_profile.steps = batch.control_profile.steps.concat([step]);
+        this.setState({
+            batch: batch,
+            batch_id: this.state.batch_id,
+            recipe_id: this.state.recipe_id,
+            is_editing: this.state.is_editing,
+            openSnackBar: this.state.openSnackBar,
+            new_step: {
+                value: "", 
+                time_offset: "",
+            }
+        });
+    }
+
+    removeStep = (step) => {
+        let batch = JSON.parse(JSON.stringify(this.state.batch));
+        let steps = batch.control_profile.steps.slice();
+        for(var i=0; i<steps.length; i++) {
+            if(steps[i].step == step) {                       
+                steps.splice(i, 1);
+            }
+        }
+        for(var i=0; i<steps.length; i++) {
+            steps[i].step = i;
+        }
+        batch.control_profile.steps = steps;
+        this.setState({
+            batch: batch,
+            batch_id: this.state.batch_id,
+            recipe_id: this.state.recipe_id,
+            is_editing: this.state.is_editing,
+            openSnackBar: this.state.openSnackBar,
+            new_step: this.state.new_step,
+        });
+    }
 
     render() {
         return (
@@ -129,7 +205,7 @@ class BatchFormPage extends React.Component {
                 <Typography variant="h6" gutterBottom>
                 <Breadcrumbs aria-label="breadcrumb">
                     <Link color="inherit" href="/receitas">Receitas</Link>
-                    <Link color="inherit" href={`/receitas/${this.state.recipe_id}`}>{this.state.recipe.name}</Link>
+                    <Link color="inherit" href={`/receitas/${this.state.recipe_id}`}>{this.state.batch.recipe.name}</Link>
                     <Link color="inherit" href={`/receitas/${this.state.recipe_id}/lotes/`}>Lotes</Link>
                     <Link color="inherit" href={`/receitas/${this.state.recipe_id}/lotes/${this.state.batch_id}`}>{this.state.batch_id == 0 ? 'Novo Lote' : this.state.batch.name}</Link>
                 </Breadcrumbs>
@@ -160,7 +236,7 @@ class BatchFormPage extends React.Component {
                             id="misc-input"
                             label="Descrição"
                             multiline
-                            rows={16}
+                            rows={8}
                             fullWidth
                             variant="outlined"
                             onChange={this.handleChange}
@@ -170,137 +246,94 @@ class BatchFormPage extends React.Component {
                     </Grid>
                     <Grid item xs={2} />
 
-                    {/* Controle: [ Int ] [  Dropdown, horas, dias ] [ float ]oC, Botão para '+', lista dinâmica */}
-                    {/* <List> */}
-                        {/* <ListItem> */}
-                        <Grid item xs={2} />
+                    <Divider />
 
-                        <Grid item xs={1}>
-                            <Typography variant="h5" gutterBottom>
-                                Manter em
-                            </Typography>
-                        </Grid>
-                         
-                        <Grid item xs={1}>
-                            <OutlinedInput
-                                id="outlined-adornment-temperature"
-                                // value={values.weight}
-                                // onChange={handleChange('weight')}
-                                endAdornment={<InputAdornment position="end">°C</InputAdornment>}
-                                // aria-describedby="outlined-weight-helper-text"
-                                inputProps={{
-                                'aria-label': 'Temperatura',
-                                }}
-                                labelWidth={0}
-                            />
-                        </Grid>
+                    <Grid item xs={2} />
+                    <Grid item xs={2}>
+                        <Typography variant="h6" gutterBottom>
+                            Controle de Temperatura
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={8} />
 
-                        <Grid item xs={1}>
-                            <Typography variant="h5" gutterBottom>
-                                Após
-                            </Typography>
-                        </Grid>
+                    <Grid item xs={2} />
+                    <Grid item xs={6} >
+                        <Table>
+                            <TableBody>
+                                {this.state.batch.control_profile.steps.map((item) => (
+                                    <TableRow>
+                                        <TableCell>Manter em</TableCell>
+                                        <TableCell>{item.value} °C</TableCell>
+                                        <TableCell>por</TableCell>
+                                        <TableCell>{item.time_offset} dias</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => this.removeStep(item.step)}>
+                                                <Tooltip title='Remover passo' placement='right'>
+                                                    <ClearIcon />
+                                                </Tooltip>
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
 
-                        <Grid item xs={1}>
-                            <TextField 
-                                id="outlined-basic" 
-                                // label="Outlined" 
-                                variant="outlined" 
-                            />
-
-                        </Grid>
-
-                        <Grid item xs={1}>
-                            <TextField
-                                id="outlined-select-time-unit"
-                                select
-                                label="Tempo"
-                                // value={currency}
-                                // onChange={handleChange}
-                                style={{width:100}}
-                                variant="outlined"
-                                >
-                                {[{value: 'Horas'}, {value: 'Dias'}].map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                    {option.value}
-                                    </MenuItem>
                                 ))}
-                            </TextField>
-                        </Grid>
+                            </TableBody>
+                        </Table>
+                    </Grid>
+                    <Grid item xs={4} />
 
-                        <Grid item xs={5} />
-                        {/* </ListItem> */}
-                    {/* </List> */}
+                    <Grid item xs={2} />
 
-                    {/*  */}
-                     
-                    {/* Controle: [ Int ] [  Dropdown, horas, dias ] [ float ]oC, Botão para '+', lista dinâmica */}
-                    {/* <List> */}
-                        {/* <ListItem> */}
-                        <Grid item xs={2} />
+                    <Grid item xs={2}>
+                        <TextField
+                            id="outlined-adornment-temperature"
+                            label="Manter em"
+                            name="value"
+                            onChange={this.handleNewStepChange}
+                            InputProps={{
+                                endAdornment: <InputAdornment position="end">°C</InputAdornment>,
+                            }}
+                            type='number'
+                            inputProps={{
+                            'aria-label': 'Temperatura',
+                            }}
+                            labelWidth={0}
+                            variant="outlined"
+                            value={this.state.new_step.value}
+                        />
+                    </Grid>
 
-                        <Grid item xs={1}>
-                            <Typography variant="h5" gutterBottom>
-                                Manter em
-                            </Typography>
-                        </Grid>
-                         
-                        <Grid item xs={1}>
-                            <OutlinedInput
-                                id="outlined-adornment-temperature"
-                                // value={values.weight}
-                                // onChange={handleChange('weight')}
-                                endAdornment={<InputAdornment position="end">°C</InputAdornment>}
-                                // aria-describedby="outlined-weight-helper-text"
-                                inputProps={{
-                                'aria-label': 'Temperatura',
-                                }}
-                                labelWidth={0}
-                            />
-                        </Grid>
+                    <Grid item xs={1}>
+                        <TextField
+                            id="outlined-adornment-time"
+                            label="por"
+                            type='number'
+                            name="time_offset"
+                            onChange={this.handleNewStepChange}
+                            InputProps={{
+                                endAdornment: <InputAdornment position="end">Dias</InputAdornment>,
+                            }}
+                            inputProps={{
+                            'aria-label': 'Tempo',
+                            }}
+                            labelWidth={0}
+                            variant="outlined"
+                            value={this.state.new_step.time_offset}
+                        />
+                    </Grid>
 
-                        <Grid item xs={1}>
-                            <Typography variant="h5" gutterBottom>
-                                Após
-                            </Typography>
-                        </Grid>
+                    <Grid item xs={1}>
+                        <IconButton onClick={() => {this.addStep()}}>
+                            <Tooltip title='Adicionar passo' placement='right'>
+                                <AddBoxIcon />
+                            </Tooltip>
+                        </IconButton>
+                    </Grid>
 
-                        <Grid item xs={1}>
-                            <TextField 
-                                id="outlined-basic" 
-                                // label="Outlined" 
-                                variant="outlined" 
-                            />
-
-                        </Grid>
-
-                        <Grid item xs={1}>
-                            <TextField
-                                id="outlined-select-time-unit"
-                                select
-                                label="Tempo"
-                                // value={currency}
-                                // onChange={handleChange}
-                                style={{width:100}}
-                                variant="outlined"
-                                >
-                                {[{value: 'Horas'}, {value: 'Dias'}].map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                    {option.value}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-
-                        <Grid item xs={5} />
-                        {/* </ListItem> */}
-                    {/* </List> */}
-
-                    {/*  */}
+                    <Grid item xs={6} />
 
                     <Grid item xs={8} />
                     <Grid item xs={1}> 
-                        <Button variant="contained" fullWidth href={`/receitas/${this.state.recipe_id}/lotes/`}>Cancelar</Button>
+                        <Button variant="contained" fullWidth href={`/receitas/${this.state.recipe_id}/lotes/`}>Voltar</Button>
                     </Grid>
                     <Grid item xs={1}> 
                         <Button variant="contained" color="primary" fullWidth onClick={this.handleSave}>Salvar</Button>

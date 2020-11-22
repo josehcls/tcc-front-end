@@ -116,7 +116,7 @@ class ListBatchesPage extends Component {
         BatchService.deleteBatch(this.state.selected.batch_id).then(() => {
             RecipeService.getBatches(this.state.batch_id, this.state.page, 10).then((data) => {
                 this.setState({
-                    data: data,
+                    data: data.content,
                     recipe: this.state.recipe,
                     recipe_id: this.state.recipe_id,
                     openDeleteDialog: this.state.openDeleteDialog,
@@ -150,8 +150,8 @@ class ListBatchesPage extends Component {
                             <StyledTableCell><b>Status</b></StyledTableCell>
                             <StyledTableCell><b>Iniciado Em</b></StyledTableCell>
                             <StyledTableCell><b>Finalizado Em</b></StyledTableCell>
-                            <StyledTableCell><b>Dispositivo</b></StyledTableCell>
-                            <StyledTableCell><b>Perfil de Controle</b></StyledTableCell>
+                            {/* <StyledTableCell><b>Dispositivo</b></StyledTableCell> */}
+                            {/* <StyledTableCell><b>Perfil de Controle</b></StyledTableCell> */}
                             <StyledTableCell><b>Ações</b></StyledTableCell>
                         </TableRow>
                     </TableHead>
@@ -160,14 +160,14 @@ class ListBatchesPage extends Component {
                             <StyledTableRow key={batch.batch_id}>
                                 <StyledTableCell>{batch.name}</StyledTableCell>
                                 <StyledTableCell>{batch.status}</StyledTableCell>
-                                <StyledTableCell>{moment(batch.started_at).format("DD/MM/YYYY HH:mm")}</StyledTableCell>
-                                <StyledTableCell>{moment(batch.finished_at).format("DD/MM/YYYY HH:mm")}</StyledTableCell>
-                                <StyledTableCell>{moment(batch.device.name)}</StyledTableCell>
-                                <StyledTableCell>{moment(batch.control_profile.name)}</StyledTableCell>
+                                <StyledTableCell>{batch.started_at ? moment(batch.started_at).format("DD/MM/YYYY HH:mm") : "-"}</StyledTableCell>
+                                <StyledTableCell>{batch.finished_at ? moment(batch.finished_at).format("DD/MM/YYYY HH:mm") : "-"}</StyledTableCell>
+                                {/* <StyledTableCell>{batch.device.name}</StyledTableCell> */}
+                                {/* <StyledTableCell>{batch.control_profile.name}</StyledTableCell> */}
                                 <StyledTableCell>
                                     <Grid container>
                                         <Grid item xs={2}>
-                                            <IconButton color='secondary' href={`/receitas/${batch.batch_id}/lotes`}>
+                                            <IconButton color='secondary' href={`/receitas/${batch.batch_id}/lotes`} disabled={batch.status !== 'STAND_BY'}>
                                                 <Tooltip title='Associar a Dispositivo' placement='top'>
                                                     <FilterFramesIcon />
                                                 </Tooltip>

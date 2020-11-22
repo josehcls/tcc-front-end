@@ -152,7 +152,7 @@ class RecipeFormPage extends React.Component {
 
                     <Grid item xs={8} />
                     <Grid item xs={1}> 
-                        <Button variant="contained" fullWidth href='/receitas'>Cancelar</Button>
+                        <Button variant="contained" fullWidth href='/receitas'>Voltar</Button>
                     </Grid>
                     <Grid item xs={1}> 
                         <Button variant="contained" color="primary" fullWidth onClick={this.handleSave}>Salvar</Button>
