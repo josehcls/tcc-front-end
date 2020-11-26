@@ -4,7 +4,7 @@ import { trackPromise } from 'react-promise-tracker';
 export const getRecipes = (page, size) =>
 trackPromise(
     api({
-        url: 'http://127.0.0.1:8082/recipe-service/v1/recipes',
+        url: 'http://127.0.0.1:5000/v1/recipes',
         method: 'GET',
         params: {page: page, size: size},
     }).then((resp) => {
@@ -15,7 +15,7 @@ trackPromise(
 export const getBatches = (recipeId, page, size) =>
 trackPromise(
     api({
-        url: `http://127.0.0.1:8082/recipe-service/v1/recipes/${recipeId}/batches`,
+        url: `http://127.0.0.1:5000/v1/recipes/${recipeId}/batches`,
         method: 'GET',
         params: {page: page, size: size},
     }).then((resp) => {
@@ -26,7 +26,7 @@ trackPromise(
 export const getRecipe = (recipeId) =>
 trackPromise(
     api({
-        url: `http://127.0.0.1:8082/recipe-service/v1/recipes/${recipeId}`,
+        url: `http://127.0.0.1:5000/v1/recipes/${recipeId}`,
         method: 'GET',
         params: {},
     }).then((resp) => {
@@ -37,7 +37,7 @@ trackPromise(
 export const postRecipe = (recipe) => 
 trackPromise(
     api({
-        url: `http://127.0.0.1:8082/recipe-service/v1/recipes`,
+        url: `http://127.0.0.1:5000/v1/recipes`,
         method: 'POST',
         data: recipe,
     }).then((resp) => {
@@ -49,7 +49,7 @@ trackPromise(
 export const putRecipe = (recipeId, recipe) => 
 trackPromise(
     api({
-        url: `http://127.0.0.1:8082/recipe-service/v1/recipes/${recipeId}`,
+        url: `http://127.0.0.1:5000/v1/recipes/${recipeId}`,
         method: 'PUT',
         data: recipe,
     }).then((resp) => {
@@ -60,7 +60,7 @@ trackPromise(
 export const deleteRecipe = (recipeId) =>
 trackPromise(
     api({
-        url: `http://127.0.0.1:8082/recipe-service/v1/recipes/${recipeId}`,
+        url: `http://127.0.0.1:5000/v1/recipes/${recipeId}`,
         method: 'DELETE',
     }).then((resp) => {
         return resp.data;
