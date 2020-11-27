@@ -51,7 +51,10 @@ class ListBatchesPage extends Component {
         const {recipe_id} = this.props.match.params;
         this.state = {
             data: [],
-            recipe: {},
+            recipe: {
+                recipe_id: 0,
+                name: '...',
+            },
             recipe_id: recipe_id,
             openDeleteDialog: false,
             selected: {name: "", recipe_id: 0},
