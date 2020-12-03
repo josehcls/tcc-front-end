@@ -26,6 +26,7 @@ import Container from '@material-ui/core/Container';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 
+import DashboardPage from '../pages/DashboardPage';
 import ListRecipesPage from '../pages/ListRecipesPage';
 import RecipeFormPage from '../pages/RecipeFormPage';
 import ListBatchesPage from '../pages/ListBatchesPage';
@@ -193,6 +194,7 @@ export default function Layout() {
           <div className={classes.appBarSpacer} />
           <Container maxWidth="xl" className={classes.container}>
               <Paper className={classes.paper} >
+                <Route exact path='/' component={DashboardPage} />
                 <Route exact path='/receitas' component={ListRecipesPage} />
                 <Route exact path='/receitas/:recipe_id' component={RecipeFormPage} />
                 <Route exact path='/receitas/:recipe_id/lotes' component={ListBatchesPage} />
